@@ -39,12 +39,15 @@
       </canvas>
     </div>
     <div>
+      <button onclick="clearSignature()" hx-trigger="click" hx-confirm="Are you sure you want to clear the signature?"
+        class="rounded bg-orange-700 text-white py-2 px-3 my-5">Clear</button>
       <label for="fileInput" class="rounded bg-blue-500 text-white py-3 px-3 my-5">Upload</label>
       <input type="file" class="upload-signature-file" id="fileInput" accept="image/*"
         onchange="uploadSignature(event)">
-      <button onclick="clearSignature()" hx-trigger="click" hx-confirm="Are you sure you want to clear the signature?"
-        class="rounded bg-orange-600 text-white py-2 px-3 my-5">Clear</button>
+
       <button onclick="downloadSignature()" class="rounded bg-blue-500 text-white py-2 px-3 my-5">Download</button>
+      <!-- <button onclick="downloadSignature()" class="rounded bg-blue-500 text-white py-2 px-3 my-5">Send To Email</button> -->
+      <!-- <button onclick="saveSignature()" class="rounded bg-blue-500 text-white py-2 px-3 my-5">Save Signature</button> -->
     </div>
 
     <script>
@@ -109,6 +112,38 @@
           reader.readAsDataURL(file);
         }
       }
+
+      function saveSignature() {
+        const signatureData = canvas.toDataURL(); // Get signature data as base64 encoded PNG image
+        fetch('/save_signature', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ signatureData })
+        })
+          .then(response => {
+            if (response.ok) {
+              console.log('Signature saved successfully');
+              alert('Signature saved successfully');
+            } else {
+              console.error('Error saving signature');
+              alert('Error saving signature');
+            }
+          })
+          .catch(error => {
+            console.error('Error saving signature:', error);
+            alert('Error saving signature');
+          });
+      }
+
+      function shareInstagram() {
+        const signatureData = canvas.toDataURL();
+        // Open Instagram with pre-filled content
+        const instagramShareLink = `https://www.instagram.com/?url=${encodeURIComponent(signatureData)}`;
+        window.open(instagramShareLink, '_blank');
+      }
+
 
     </script>
 
