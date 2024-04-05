@@ -25,6 +25,10 @@
     .upload-signature-file {
       display: none;
     }
+
+    .upld-btn {
+      cursor: pointer;
+    }
   </style>
 </head>
 
@@ -33,7 +37,7 @@
     <h2 class="py-5">Sign Here</h2>
     <div id="signatureContainer">
       <!-- Signature will be displayed here -->
-      <canvas id="signatureCanvas" width="500" height="300" class="rounded" hx-trigger="click"
+      <canvas id="signatureCanvas" width="300" height="280" class="rounded" hx-trigger="click"
         hx-target="#signatureContainer" hx-swap="outerHTML" hx-vals="_signature=${btoa(this.toDataURL('image/png'))}">
         Your browser does not support the HTML5 canvas tag, try with another browser.
       </canvas>
@@ -41,7 +45,7 @@
     <div>
       <button onclick="clearSignature()" hx-trigger="click" hx-confirm="Are you sure you want to clear the signature?"
         class="rounded bg-orange-700 text-white py-2 px-3 my-5">Clear</button>
-      <label for="fileInput" class="rounded bg-blue-500 text-white py-3 px-3 my-5">Upload</label>
+      <label for="fileInput" class="rounded bg-blue-500 text-white py-3 px-3 my-5 upld-btn">Upload</label>
       <input type="file" class="upload-signature-file" id="fileInput" accept="image/*"
         onchange="uploadSignature(event)">
 
@@ -51,33 +55,70 @@
     </div>
 
     <script>
+
+
       const canvas = document.getElementById('signatureCanvas');
       const context = canvas.getContext('2d');
       let isDrawing = false;
-      let lastX = 0;
-      let lastY = 0;
 
-      canvas.addEventListener('mousedown', (e) => {
-        isDrawing = true;
-        [lastX, lastY] = [e.offsetX, e.offsetY];
-      });
+      canvas.addEventListener('mousedown', startDrawing);
+      canvas.addEventListener('touchstart', startDrawing);
 
       canvas.addEventListener('mousemove', draw);
-      canvas.addEventListener('mouseup', () => isDrawing = false);
-      canvas.addEventListener('mouseout', () => isDrawing = false);
+      canvas.addEventListener('touchmove', draw);
+
+      canvas.addEventListener('mouseup', stopDrawing);
+      canvas.addEventListener('mouseleave', stopDrawing);
+      canvas.addEventListener('touchend', stopDrawing);
+
+      let lastX;
+      let lastY;
+
+      function startDrawing(e) {
+        isDrawing = true;
+        const rect = canvas.getBoundingClientRect();
+        [lastX, lastY] = getMousePosition(e, rect);
+        context.beginPath();
+        context.moveTo(lastX, lastY);
+      }
 
       function draw(e) {
         if (!isDrawing) return;
+        e.preventDefault();
+        const rect = canvas.getBoundingClientRect();
+        const [currentX, currentY] = getMousePosition(e, rect);
+        drawLine(lastX, lastY, currentX, currentY);
+        lastX = currentX;
+        lastY = currentY;
+      }
+
+      function stopDrawing() {
+        isDrawing = false;
+      }
+
+      function getMousePosition(e, rect) {
+        let mouseX, mouseY;
+        if (e.type === 'mousedown' || e.type === 'mousemove') {
+          mouseX = e.clientX - rect.left;
+          mouseY = e.clientY - rect.top;
+        } else if (e.type === 'touchstart' || e.type === 'touchmove') {
+          mouseX = e.touches[0].clientX - rect.left;
+          mouseY = e.touches[0].clientY - rect.top;
+        }
+        return [mouseX, mouseY];
+      }
+
+      function drawLine(x1, y1, x2, y2) {
         context.beginPath();
-        context.moveTo(lastX, lastY);
-        context.lineTo(e.offsetX, e.offsetY);
+        context.moveTo(x1, y1);
+        context.lineTo(x2, y2);
         context.strokeStyle = 'black';
         context.lineWidth = 2;
         context.lineCap = 'round';
         context.lineJoin = 'round';
         context.stroke();
-        [lastX, lastY] = [e.offsetX, e.offsetY];
       }
+
 
       function clearSignature() {
         context.clearRect(0, 0, canvas.width, canvas.height);
@@ -113,6 +154,7 @@
         }
       }
 
+      // will use it for save signature in data for user future reference ....
       function saveSignature() {
         const signatureData = canvas.toDataURL(); // Get signature data as base64 encoded PNG image
         fetch('/save_signature', {
@@ -137,12 +179,7 @@
           });
       }
 
-      function shareInstagram() {
-        const signatureData = canvas.toDataURL();
-        // Open Instagram with pre-filled content
-        const instagramShareLink = `https://www.instagram.com/?url=${encodeURIComponent(signatureData)}`;
-        window.open(instagramShareLink, '_blank');
-      }
+
 
 
     </script>
