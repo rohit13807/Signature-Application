@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign Feature</title>
+  <script src="https://cdn.jsdelivr.net/npm/htmx.org@1.6.0/dist/htmx.min.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    #signatureContainer {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: auto;
+      /* background-color: rgb(161, 161, 161); */
+      /* margin-top: 100px; */
+    }
+
+    #signatureCanvas {
+      border: 1px solid black;
+      cursor: crosshair;
+    }
+
+    .upload-signature-file {
+      display: none;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="text-center my-5 py-5">
+    <h2 class="py-5">Sign Here</h2>
+    <div id="signatureContainer">
+      <!-- Signature will be displayed here -->
+      <canvas id="signatureCanvas" width="500" height="300" class="rounded" hx-trigger="click"
+        hx-target="#signatureContainer" hx-swap="outerHTML" hx-vals="_signature=${btoa(this.toDataURL('image/png'))}">
+        Your browser does not support the HTML5 canvas tag, try with another browser.
+      </canvas>
+    </div>
+    <div>
+      <label for="fileInput" class="rounded bg-blue-500 text-white py-3 px-3 my-5">Upload</label>
+      <input type="file" class="upload-signature-file" id="fileInput" accept="image/*"
+        onchange="uploadSignature(event)">
+      <button onclick="clearSignature()" hx-trigger="click" hx-confirm="Are you sure you want to clear the signature?"
+        class="rounded bg-orange-600 text-white py-2 px-3 my-5">Clear</button>
+      <button onclick="downloadSignature()" class="rounded bg-blue-500 text-white py-2 px-3 my-5">Download</button>
+    </div>
+
+    <script>
+      const canvas = document.getElementById('signatureCanvas');
+      const context = canvas.getContext('2d');
+      let isDrawing = false;
+      let lastX = 0;
+      let lastY = 0;
+
+      canvas.addEventListener('mousedown', (e) => {
+        isDrawing = true;
+        [lastX, lastY] = [e.offsetX, e.offsetY];
+      });
+
+      canvas.addEventListener('mousemove', draw);
+      canvas.addEventListener('mouseup', () => isDrawing = false);
+      canvas.addEventListener('mouseout', () => isDrawing = false);
+
+      function draw(e) {
+        if (!isDrawing) return;
+        context.beginPath();
+        context.moveTo(lastX, lastY);
+        context.lineTo(e.offsetX, e.offsetY);
+        context.strokeStyle = 'black';
+        context.lineWidth = 2;
+        context.lineCap = 'round';
+        context.lineJoin = 'round';
+        context.stroke();
+        [lastX, lastY] = [e.offsetX, e.offsetY];
+      }
+
+      function clearSignature() {
+        context.clearRect(0, 0, canvas.width, canvas.height);
+      }
+
+      function downloadSignature() {
+        const whiteCanvas = document.createElement('canvas');
+        const whiteContext = whiteCanvas.getContext('2d');
+        whiteCanvas.width = canvas.width;
+        whiteCanvas.height = canvas.height;
+        whiteContext.fillStyle = 'white';
+        whiteContext.fillRect(0, 0, whiteCanvas.width, whiteCanvas.height);
+        whiteContext.drawImage(canvas, 0, 0);
+        const downloadLink = document.createElement('a');
+        downloadLink.setAttribute('download', 'signature.png');
+        downloadLink.setAttribute('href', whiteCanvas.toDataURL('image/png').replace('image/png', 'image/octet-stream'));
+        downloadLink.click();
+      }
+
+      function uploadSignature(event) {
+        const file = event.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = function (e) {
+            const img = new Image();
+            img.onload = function () {
+              context.clearRect(0, 0, canvas.width, canvas.height);
+              context.drawImage(img, 0, 0, canvas.width, canvas.height);
+            };
+            img.src = e.target.result;
+          };
+          reader.readAsDataURL(file);
+        }
+      }
+
+    </script>
+
+</body>
+
+</html>
