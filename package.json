@@ -1,0 +1,17 @@
+{
+  "name": "signapp",
+  "version": "1.0.0",
+  "description": "signature app",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "nodemon server.js"
+  },
+  "author": "rohit13807",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.19.2",
+    "nodemon": "^3.1.0",
+    "pdf-lib": "^1.17.1"
+  }
+}

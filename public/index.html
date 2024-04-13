@@ -7,6 +7,7 @@
   <title>Sign Feature</title>
   <script src="https://cdn.jsdelivr.net/npm/htmx.org@1.6.0/dist/htmx.min.js"></script>
   <script src="https://cdn.tailwindcss.com"></script>
+
   <style>
     #signatureContainer {
       display: flex;
@@ -35,6 +36,23 @@
 <body>
   <div class="text-center my-5 py-5">
     <h2 class="py-5">Sign Here</h2>
+
+    <input type="file" accept=".doc,.docx,.pdf" onchange="handleFile(event)">
+    <div id="documentPreview">
+      <iframe id="pdfPreview" src="" frameborder="0"></iframe>
+    </div>
+
+    <select id="fontFamilySelect" class="form-select">
+      <option value="Arial">Arial</option>
+      <option value="Verdana">Verdana</option>
+      <option value="Times New Roman">Times New Roman</option>
+      <option value="Courier New">Courier New</option>
+      <!-- Add more font options as needed -->
+    </select>
+    <br>
+    <input type="text" name="name" id="name" class="ring-1 form-control" placeholder="Enter your name">
+    <button onclick="drawText()" class="rounded bg-blue-500 text-white py-2 px-3 my-5">Draw Text</button>
+    <br />
     <div id="signatureContainer">
       <!-- Signature will be displayed here -->
       <canvas id="signatureCanvas" width="300" height="280" class="rounded" hx-trigger="click"
@@ -50,12 +68,27 @@
         onchange="uploadSignature(event)">
 
       <button onclick="downloadSignature()" class="rounded bg-blue-500 text-white py-2 px-3 my-5">Download</button>
-      <!-- <button onclick="downloadSignature()" class="rounded bg-blue-500 text-white py-2 px-3 my-5">Send To Email</button> -->
-      <!-- <button onclick="saveSignature()" class="rounded bg-blue-500 text-white py-2 px-3 my-5">Save Signature</button> -->
     </div>
 
     <script>
+      let documentData = null;
+      let signatureData = null;
 
+      function handleFile(event) {
+        const file = event.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = function (e) {
+            documentData = e.target.result;
+            showDocumentPreview(documentData);
+          };
+          reader.readAsDataURL(file);
+        }
+      }
+      function showDocumentPreview(documentData) {
+        const pdfPreview = document.getElementById('pdfPreview');
+        pdfPreview.src = documentData;
+      }
 
       const canvas = document.getElementById('signatureCanvas');
       const context = canvas.getContext('2d');
@@ -73,6 +106,7 @@
 
       let lastX;
       let lastY;
+      let selectedFont = 'Arial'; // Default font family
 
       function startDrawing(e) {
         isDrawing = true;
@@ -179,8 +213,32 @@
           });
       }
 
+      document.getElementById('fontFamilySelect').addEventListener('change', function () {
+        selectedFont = this.value;
+      });
+
+      function drawText() {
+        const name = document.getElementById('name').value;
+        context.clearRect(0, 0, canvas.width, canvas.height);
+        context.font = `30px ${selectedFont}`;
+        context.fillStyle = 'black';
+        context.fillText(name, 50, 50); // Adjust the position as needed
+      }
 
 
+      function downloadSignedDocument() {
+        if (documentData && signatureData) {
+          // Here you would merge the signature onto the document and download it
+          // For simplicity, let's assume the signature is appended at the bottom
+          const mergedDocument = documentData; // Assume signature is appended
+          const downloadLink = document.createElement('a');
+          downloadLink.setAttribute('download', 'signed_document.doc');
+          downloadLink.setAttribute('href', mergedDocument);
+          downloadLink.click();
+        } else {
+          alert('Please upload a document and draw your signature before downloading.');
+        }
+      }
 
     </script>
 
