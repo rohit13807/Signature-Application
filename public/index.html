@@ -7,58 +7,100 @@
   <title>Sign Feature</title>
   <script src="https://cdn.jsdelivr.net/npm/htmx.org@1.6.0/dist/htmx.min.js"></script>
   <script src="https://cdn.tailwindcss.com"></script>
-  <script src="./style.css"></script>
 
 </head>
+<style>
+  body {
+    background-color: black;
+  }
+
+  .main-container {
+    border: 1px solid gray;
+    margin: 30%;
+    border-radius: 15px;
+    box-shadow: 10 10;
+    background-color: rgb(241, 241, 241);
+  }
+
+  .sign-here-title {
+    background-color: rgb(242, 139, 84);
+    padding: 5px;
+    color: black;
+    margin-bottom: 15px;
+    border-radius: 10px;
+  }
+
+  #signatureContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: auto;
+    /* background-color: rgb(161, 161, 161); */
+    /* margin-top: 100px; */
+  }
+
+  #signatureCanvas {
+    border: 1px solid black;
+    cursor: crosshair;
+  }
+
+  .upload-signature-file {
+    display: none;
+  }
+
+  .upld-btn {
+    cursor: pointer;
+  }
+</style>
 
 <body>
-  <div class="text-center my-5 py-5">
-    <h2 class="py-5">Sign Here</h2>
+  <div class="text-center my-5 py-5 main-container">
 
-    <input type="file" accept=".doc,.docx,.pdf" onchange="handleFile(event)">
-    <div id="documentPreview">
+    <div class="sign-here-title">
+      <h2 class="py-5">Sign Here</h2>
+    </div>
+    <!-- <div id="documentPreview">
       <iframe id="pdfPreview" src="" frameborder="0"></iframe>
+    </div> -->
+
+    <div class="max-w-sm mx-auto">
+      <label for="fontFamilySelect" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Choose font
+        options</label>
+      <select id="fontFamilySelect"
+        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+        <option value="Arial">Arial</option>
+        <option value="Verdana">Verdana</option>
+        <option value="Times New Roman">Times New Roman</option>
+        <option value="Courier New">Courier New</option>
+        <option value="Helvetica">Helvetica</option>
+        <option value="Garamond, serif">Garamond, serif</option>
+        <option value="Courier, monospace">Courier, monospace</option>
+        <option value="Brush Script MT, cursive">Brush Script MT, cursive</option>
+      </select>
+
+      <div class="mb-6">
+        <label for="name" class="block mt-2 mb-2 text-sm font-medium text-gray-900 dark:text-white">Enter signature
+          name</label>
+        <input type="text" name="name" id="name"
+          class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+          placeholder="Enter your name">
+      </div>
+      <!-- <div class="mb-6">
+        <div>
+          <label for="name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Enter signature
+            name</label>
+          <input type="text" name="name" id="name"
+            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+            placeholder="Enter Signature text" />
+        </div>
+      </div> -->
+
+      <button onclick="drawText()" class="rounded bg-blue-500 text-white py-2 px-3 my-5">Draw
+        Text</button>
+
     </div>
 
-    <select id="fontFamilySelect" class="form-select">
-      <option value="Arial">Arial</option>
-      <option value="Arial, sans-serif" style="font-style: italic;">Arial Italic</option>
-      <option value="Verdana">Verdana</option>
-      <option value="Verdana, sans-serif" style="font-style: italic;">Verdana Italic</option>
-      <option value="Times New Roman">Times New Roman</option>
-      <option value="Courier New">Courier New</option>
-      <option value="Helvetica">Helvetica</option>
-      <option value="Georgia">Georgia</option>
-      <option value="Tahoma">Tahoma</option>
-      <option value="Lucida Console">Lucida Console</option>
-      <option value="Palatino Linotype">Palatino Linotype</option>
-      <option value="Book Antiqua">Book Antiqua</option>
-      <option value="Comic Sans MS">Comic Sans MS</option>
-      <option value="Impact">Impact</option>
-      <option value="Trebuchet MS">Trebuchet MS</option>
-      <option value="Garamond">Garamond</option>
-      <option value="Courier">Courier</option>
-      <option value="Arial Black">Arial Black</option>
-      <option value="Arial Narrow">Arial Narrow</option>
-      <option value="Arial Rounded MT Bold">Arial Rounded MT Bold</option>
-      <option value="Brush Script MT">Brush Script MT</option>
-      <option value="Copperplate">Copperplate</option>
-      <option value="Futura">Futura</option>
-      <option value="Rockwell">Rockwell</option>
-      <option value="Segoe UI">Segoe UI</option>
-      <option value="Verdana, Geneva, sans-serif">Verdana, Geneva, sans-serif</option>
-      <option value="Tahoma, Geneva, sans-serif">Tahoma, Geneva, sans-serif</option>
-      <option value="Impact, Charcoal, sans-serif">Impact, Charcoal, sans-serif</option>
-      <option value="Trebuchet MS, Helvetica, sans-serif">Trebuchet MS, Helvetica, sans-serif</option>
-      <option value="Garamond, serif">Garamond, serif</option>
-      <option value="Courier, monospace">Courier, monospace</option>
-      <option value="Brush Script MT, cursive">Brush Script MT, cursive</option>
-    </select>
 
-    <br>
-    <input type="text" name="name" id="name" class="ring-1 form-control" placeholder="Enter your name">
-    <button onclick="drawText()" class="rounded bg-blue-500 text-white py-2 px-3 my-5">Draw Text</button>
-    <br />
     <div id="signatureContainer">
       <!-- Signature will be displayed here -->
       <canvas id="signatureCanvas" width="300" height="280" class="rounded" hx-trigger="click"
@@ -75,178 +117,168 @@
 
       <button onclick="downloadSignature()" class="rounded bg-blue-500 text-white py-2 px-3 my-5">Download</button>
     </div>
+  </div>
 
-    <script>
-      let documentData = null;
-      let signatureData = null;
+  <script>
+    let documentData = null;
+    let signatureData = null;
 
-      function handleFile(event) {
-        const file = event.target.files[0];
-        if (file) {
-          const reader = new FileReader();
-          reader.onload = function (e) {
-            documentData = e.target.result;
-            showDocumentPreview(documentData);
+    function showDocumentPreview(documentData) {
+      const pdfPreview = document.getElementById('pdfPreview');
+      pdfPreview.src = documentData;
+    }
+
+    const canvas = document.getElementById('signatureCanvas');
+    const context = canvas.getContext('2d');
+    let isDrawing = false;
+
+    canvas.addEventListener('mousedown', startDrawing);
+    canvas.addEventListener('touchstart', startDrawing);
+
+    canvas.addEventListener('mousemove', draw);
+    canvas.addEventListener('touchmove', draw);
+
+    canvas.addEventListener('mouseup', stopDrawing);
+    canvas.addEventListener('mouseleave', stopDrawing);
+    canvas.addEventListener('touchend', stopDrawing);
+
+    let lastX;
+    let lastY;
+    let selectedFont = 'Arial'; // Default font family
+
+    function startDrawing(e) {
+      isDrawing = true;
+      const rect = canvas.getBoundingClientRect();
+      [lastX, lastY] = getMousePosition(e, rect);
+      context.beginPath();
+      context.moveTo(lastX, lastY);
+    }
+
+    function draw(e) {
+      if (!isDrawing) return;
+      e.preventDefault();
+      const rect = canvas.getBoundingClientRect();
+      const [currentX, currentY] = getMousePosition(e, rect);
+      drawLine(lastX, lastY, currentX, currentY);
+      lastX = currentX;
+      lastY = currentY;
+    }
+
+    function stopDrawing() {
+      isDrawing = false;
+    }
+
+    function getMousePosition(e, rect) {
+      let mouseX, mouseY;
+      if (e.type === 'mousedown' || e.type === 'mousemove') {
+        mouseX = e.clientX - rect.left;
+        mouseY = e.clientY - rect.top;
+      } else if (e.type === 'touchstart' || e.type === 'touchmove') {
+        mouseX = e.touches[0].clientX - rect.left;
+        mouseY = e.touches[0].clientY - rect.top;
+      }
+      return [mouseX, mouseY];
+    }
+
+    function drawLine(x1, y1, x2, y2) {
+      context.beginPath();
+      context.moveTo(x1, y1);
+      context.lineTo(x2, y2);
+      context.strokeStyle = 'black';
+      context.lineWidth = 2;
+      context.lineCap = 'round';
+      context.lineJoin = 'round';
+      context.stroke();
+    }
+
+
+    function clearSignature() {
+      context.clearRect(0, 0, canvas.width, canvas.height);
+    }
+
+    function downloadSignature() {
+      const whiteCanvas = document.createElement('canvas');
+      const whiteContext = whiteCanvas.getContext('2d');
+      whiteCanvas.width = canvas.width;
+      whiteCanvas.height = canvas.height;
+      whiteContext.fillStyle = 'white';
+      whiteContext.fillRect(0, 0, whiteCanvas.width, whiteCanvas.height);
+      whiteContext.drawImage(canvas, 0, 0);
+      const downloadLink = document.createElement('a');
+      downloadLink.setAttribute('download', 'signature.png');
+      downloadLink.setAttribute('href', whiteCanvas.toDataURL('image/png').replace('image/png', 'image/octet-stream'));
+      downloadLink.click();
+    }
+
+    function uploadSignature(event) {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          const img = new Image();
+          img.onload = function () {
+            context.clearRect(0, 0, canvas.width, canvas.height);
+            context.drawImage(img, 0, 0, canvas.width, canvas.height);
           };
-          reader.readAsDataURL(file);
-        }
+          img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
       }
-      function showDocumentPreview(documentData) {
-        const pdfPreview = document.getElementById('pdfPreview');
-        pdfPreview.src = documentData;
-      }
+    }
 
-      const canvas = document.getElementById('signatureCanvas');
-      const context = canvas.getContext('2d');
-      let isDrawing = false;
-
-      canvas.addEventListener('mousedown', startDrawing);
-      canvas.addEventListener('touchstart', startDrawing);
-
-      canvas.addEventListener('mousemove', draw);
-      canvas.addEventListener('touchmove', draw);
-
-      canvas.addEventListener('mouseup', stopDrawing);
-      canvas.addEventListener('mouseleave', stopDrawing);
-      canvas.addEventListener('touchend', stopDrawing);
-
-      let lastX;
-      let lastY;
-      let selectedFont = 'Arial'; // Default font family
-
-      function startDrawing(e) {
-        isDrawing = true;
-        const rect = canvas.getBoundingClientRect();
-        [lastX, lastY] = getMousePosition(e, rect);
-        context.beginPath();
-        context.moveTo(lastX, lastY);
-      }
-
-      function draw(e) {
-        if (!isDrawing) return;
-        e.preventDefault();
-        const rect = canvas.getBoundingClientRect();
-        const [currentX, currentY] = getMousePosition(e, rect);
-        drawLine(lastX, lastY, currentX, currentY);
-        lastX = currentX;
-        lastY = currentY;
-      }
-
-      function stopDrawing() {
-        isDrawing = false;
-      }
-
-      function getMousePosition(e, rect) {
-        let mouseX, mouseY;
-        if (e.type === 'mousedown' || e.type === 'mousemove') {
-          mouseX = e.clientX - rect.left;
-          mouseY = e.clientY - rect.top;
-        } else if (e.type === 'touchstart' || e.type === 'touchmove') {
-          mouseX = e.touches[0].clientX - rect.left;
-          mouseY = e.touches[0].clientY - rect.top;
-        }
-        return [mouseX, mouseY];
-      }
-
-      function drawLine(x1, y1, x2, y2) {
-        context.beginPath();
-        context.moveTo(x1, y1);
-        context.lineTo(x2, y2);
-        context.strokeStyle = 'black';
-        context.lineWidth = 2;
-        context.lineCap = 'round';
-        context.lineJoin = 'round';
-        context.stroke();
-      }
-
-
-      function clearSignature() {
-        context.clearRect(0, 0, canvas.width, canvas.height);
-      }
-
-      function downloadSignature() {
-        const whiteCanvas = document.createElement('canvas');
-        const whiteContext = whiteCanvas.getContext('2d');
-        whiteCanvas.width = canvas.width;
-        whiteCanvas.height = canvas.height;
-        whiteContext.fillStyle = 'white';
-        whiteContext.fillRect(0, 0, whiteCanvas.width, whiteCanvas.height);
-        whiteContext.drawImage(canvas, 0, 0);
-        const downloadLink = document.createElement('a');
-        downloadLink.setAttribute('download', 'signature.png');
-        downloadLink.setAttribute('href', whiteCanvas.toDataURL('image/png').replace('image/png', 'image/octet-stream'));
-        downloadLink.click();
-      }
-
-      function uploadSignature(event) {
-        const file = event.target.files[0];
-        if (file) {
-          const reader = new FileReader();
-          reader.onload = function (e) {
-            const img = new Image();
-            img.onload = function () {
-              context.clearRect(0, 0, canvas.width, canvas.height);
-              context.drawImage(img, 0, 0, canvas.width, canvas.height);
-            };
-            img.src = e.target.result;
-          };
-          reader.readAsDataURL(file);
-        }
-      }
-
-      // will use it for save signature in data for user future reference ....
-      function saveSignature() {
-        const signatureData = canvas.toDataURL(); // Get signature data as base64 encoded PNG image
-        fetch('/save_signature', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({ signatureData })
-        })
-          .then(response => {
-            if (response.ok) {
-              console.log('Signature saved successfully');
-              alert('Signature saved successfully');
-            } else {
-              console.error('Error saving signature');
-              alert('Error saving signature');
-            }
-          })
-          .catch(error => {
-            console.error('Error saving signature:', error);
+    // will use it for save signature in data for user future reference ....
+    function saveSignature() {
+      const signatureData = canvas.toDataURL(); // Get signature data as base64 encoded PNG image
+      fetch('/save_signature', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ signatureData })
+      })
+        .then(response => {
+          if (response.ok) {
+            console.log('Signature saved successfully');
+            alert('Signature saved successfully');
+          } else {
+            console.error('Error saving signature');
             alert('Error saving signature');
-          });
+          }
+        })
+        .catch(error => {
+          console.error('Error saving signature:', error);
+          alert('Error saving signature');
+        });
+    }
+
+    document.getElementById('fontFamilySelect').addEventListener('change', function () {
+      selectedFont = this.value;
+    });
+
+    function drawText() {
+      const name = document.getElementById('name').value;
+      context.clearRect(0, 0, canvas.width, canvas.height);
+      context.font = `30px ${selectedFont}`;
+      context.fillStyle = 'black';
+      context.fillText(name, 50, 50); // Adjust the position as needed
+    }
+
+
+    function downloadSignedDocument() {
+      if (documentData && signatureData) {
+        // Here you would merge the signature onto the document and download it
+        // For simplicity, let's assume the signature is appended at the bottom
+        const mergedDocument = documentData; // Assume signature is appended
+        const downloadLink = document.createElement('a');
+        downloadLink.setAttribute('download', 'signed_document.doc');
+        downloadLink.setAttribute('href', mergedDocument);
+        downloadLink.click();
+      } else {
+        alert('Please upload a document and draw your signature before downloading.');
       }
+    }
 
-      document.getElementById('fontFamilySelect').addEventListener('change', function () {
-        selectedFont = this.value;
-      });
-
-      function drawText() {
-        const name = document.getElementById('name').value;
-        context.clearRect(0, 0, canvas.width, canvas.height);
-        context.font = `30px ${selectedFont}`;
-        context.fillStyle = 'black';
-        context.fillText(name, 50, 50); // Adjust the position as needed
-      }
-
-
-      function downloadSignedDocument() {
-        if (documentData && signatureData) {
-          // Here you would merge the signature onto the document and download it
-          // For simplicity, let's assume the signature is appended at the bottom
-          const mergedDocument = documentData; // Assume signature is appended
-          const downloadLink = document.createElement('a');
-          downloadLink.setAttribute('download', 'signed_document.doc');
-          downloadLink.setAttribute('href', mergedDocument);
-          downloadLink.click();
-        } else {
-          alert('Please upload a document and draw your signature before downloading.');
-        }
-      }
-
-    </script>
+  </script>
 
 </body>
 
